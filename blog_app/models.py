@@ -9,11 +9,22 @@ class Post(models.Model):
     author = models.ForeignKey("auth.User", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now=True)
-    published_at = models.DateTimeField(null=True)
+    published_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.title
     
+
+
+
+
+
+
+
+
+#published_at => date time xa => data xa => null xaina
+#published_at => data time xaina => data xaina => null xa
+
 
 
 
