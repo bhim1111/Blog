@@ -1,10 +1,11 @@
 from django.shortcuts import redirect, render
 from blog_app.forms import PostForm
+from django.urls import reverse_lazy
 
 from blog_app.models import Post
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -22,6 +23,9 @@ class PostListView(ListView):
     
 
 
+
+
+
 class PostDetailView(DetailView):
     model = Post
     template_name ='post_detail.html'
@@ -36,6 +40,8 @@ class PostDetailView(DetailView):
 
 
 
+
+
 class DraftListView(LoginRequiredMixin, ListView):
     model = Post
     template_name= 'draft_list.html'
@@ -46,7 +52,7 @@ class DraftListView(LoginRequiredMixin, ListView):
         return posts
             
                
-       
+
       
     
 
@@ -77,6 +83,11 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse("draft-detail", kwargs={"pk": self.object.pk})
 
+
+
+
+
+
     
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
@@ -87,7 +98,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         post = self.get_object()
         if post.published_at:
-            return reverse("post-detail", kwargs={"pk: post.pk"})
+            return reverse("post-detail", kwargs={"pk": post.pk})
         else:
             return reverse("draft-detail", kwargs={"pk": post.pk})
 
@@ -99,8 +110,15 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 
 
 
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    template_name = "post_confirm_delete.html"
 
-
+    def get_success_url(self):
+        if self.object.published_at:
+            return reverse_lazy("post-list")
+        return reverse_lazy("draft-list")
+        
 
 @login_required
 def post_delete(request, pk):
@@ -108,13 +126,12 @@ def post_delete(request, pk):
     post.delete()
     if post.published_at:
         return redirect("post-list")
-
     else:
         return redirect("draft-list")
 
 
 
-
+from django.utils import timezone
 
 class DraftPublishView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -122,4 +139,3 @@ class DraftPublishView(LoginRequiredMixin, View):
         post.published_at = timezone.now()
         post.save()
         return redirect("post-list")
-

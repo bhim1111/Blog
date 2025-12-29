@@ -8,7 +8,7 @@
             <h1>
                 <a href="#" class="text-decoration-none fst-italic">{{ post.title }}</a>
             </h1>
-            {% if request.user.is_authenticates %}
+            {% if request.user.is_authenticated %}
             <div class="mt-2 my-2">
                 <a href="{% url 'post-update' post.pk %}" class="btn btn-primary">EDIT</a>
                 <a href="{% url 'post-delete' post.pk %}" class="btn btn-danger">DELETE</a>
